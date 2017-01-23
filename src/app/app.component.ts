@@ -12,6 +12,7 @@ import 'rxjs/add/operator/startWith';
   template: `
   <button #left md-raised-button color="accent">Move Left</button>
   <button #right md-raised-button color="accent">Move Right</button>
+  <button #down md-raised-button color="accent">Move Down</button>
   <div class="container">
     <div #ball class="ball"
       [style.left]="position.x + 'px'"
@@ -23,13 +24,21 @@ import 'rxjs/add/operator/startWith';
 export class AppComponent implements OnInit {
   @ViewChild('left') left;
   @ViewChild('right') right;
+  @ViewChild('down') down;
   position: any;
 
   ngOnInit() {
-    Observable.fromEvent(this.getNativeElement(this.right), 'click')
-      .map(event => 10)
+    const left$ = Observable.fromEvent(this.getNativeElement(this.left), 'click')
+                            .map(event => ({ x: -10, y: 0}));
+    const right$ = Observable.fromEvent(this.getNativeElement(this.right), 'click')
+                            .map(event => ({ x: 10, y: 0}));
+    const down$ = Observable.fromEvent(this.getNativeElement(this.down), 'click')
+                            .map(event => ({ x: 0, y: 10}));
+    
+
+    Observable.merge(left$, right$, down$)      
       .startWith({x: 200, y: 200})
-      .scan((acc, curr) => Object.assign({}, acc, {x: acc.x + curr}))
+      .scan((acc, curr) => Object.assign({}, acc, {x: acc.x + curr.x, y: acc.y + curr.y}))
       .subscribe(position => this.position = position);
   }
 
