@@ -41,6 +41,7 @@ export class AppComponent implements OnInit {
       .do(event => this.ball.nativeElement.style.pointerEvents = 'all');
 
     down$
+      .switchMap(event => move$.takeUntil(up$))
       .startWith({ x: 100, y: 100})
       .subscribe(position => this.position = position);
   }
