@@ -23,8 +23,32 @@ export class AppComponent implements OnInit {
   position: any;
 
   ngOnInit() {
-    Observable.merge()
+    const leftArrow$ = Observable.fromEvent(document, 'keydown')
+      .filter(event => event.key === 'ArrowLeft')
+      .mapTo(position => this.decrement(position, 'x', 10));
+
+    const rightArrow$ = Observable.fromEvent(document, 'keydown')
+      .filter(event => event.key === 'ArrowRight')
+      .mapTo(position => this.increment(position, 'x', 10));
+
+    const downArrow$ = Observable.fromEvent(document, 'keydown')
+      .filter(event => event.key === 'ArrowDown')
+      .mapTo(position => this.increment(position, 'y', 10));
+
+    const upArrow$ = Observable.fromEvent(document, 'keydown')
+      .filter(event => event.key === 'ArrowUp')
+      .mapTo(position => this.decrement(position, 'y', 10));
+
+    const letterA$ = Observable.fromEvent(document, 'keydown')
+      .filter(event => event.keyCode === 65)
+      .mapTo(position => {
+        console.log('a pressed');
+        return position;
+      });
+
+    Observable.merge(leftArrow$, rightArrow$, downArrow$, upArrow$, letterA$)
       .startWith({x: 200, y: 200})
+      .scan((acc, curr) => curr(acc))
       .subscribe(position => this.position = position)
   }
 
